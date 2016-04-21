@@ -14,6 +14,13 @@ My solution was to rig up our electronic latch to a Raspberry Pi and configure i
 
 This solution has been used for about a year in Forma Labs but until now was written in unmaintainable Python. It has recently been rewritten into a Go server for the PiFace controller and a CLI client that accepts and validates codes. This not only allows for better static checks of program correctness, it broadens scope for other methods of door validation in future, including emails, SMS, or one-click mobile Apps. It has somewhat increased the complexity of simple set-ups, though. See below for a setup guide.
 
+### Considerations!
+TOTP tokens are by default only 6 digits. For a large enough number of members this increases the odds of either brute force attempts succeeding (despite the default rate limits) or of colliding keys, which can confuse logging.
+
+Even with few members the odds of colliding TOTP keys are somewhat high, so bear in mind that the access logs can mislead!
+
+Future design feature I'd like to implement would keep track of how many keys are in play, and warn if there are enough to expose the door to practical brute force, or if the odds of collision are high enough to create a significant logging problem. Under such circumstances TOTP key length can be increased to eight, but this goes against the Google Authenticator defaults so will increase management overhead for nontechnical users.
+
 ### Features
 #### Door Control Server
 1. Logging of door access requests by API key.
