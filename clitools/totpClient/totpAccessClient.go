@@ -10,10 +10,8 @@ preferably disabling or remapping invalid keys and, if possible, numlock.
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"io/ioutil"
-	"os"
 
 	"gopkg.in/inconshreveable/log15.v2"
 
@@ -55,8 +53,7 @@ func init() {
 func main() {
 	for {
 		print("Please enter 6-digit code: ")
-		reader := bufio.NewReader(os.Stdin)
-		codeAttempt, err := reader.ReadString('\n')
+		codeAttempt, err := getKeypadInput()
 		if err != nil {
 			log15.Error("Error getting input", log15.Ctx{"err": err, "attempt": codeAttempt})
 			continue
