@@ -21,13 +21,14 @@ import (
 )
 
 var (
-	accounts       []FormiteAccount
-	totps          *totpset.Set
-	accountsFile   = kingpin.Arg("accounts", "Accounts JSON File").Required().ExistingFile()
-	apiKey         = kingpin.Arg("apiKey", "API key for the door service (base64)").Required().String()
-	secondsGranted = kingpin.Flag("seconds-granted", "Seconds to unlock door for to permit entry on successful authentication").Default("5").Short('s').Int()
-	doorPort       = kingpin.Flag("door-port", "Port the door microservice API listens on").Default("8080").Short('p').Int()
-	door           doorapi.Door
+	accounts         []FormiteAccount
+	totps            *totpset.Set
+	accountsFile     = kingpin.Arg("accounts", "Accounts JSON File").Required().ExistingFile()
+	apiKey           = kingpin.Arg("apiKey", "API key for the door service (base64)").Required().String()
+	secondsGranted   = kingpin.Flag("seconds-granted", "Seconds to unlock door for to permit entry on successful authentication").Default("5").Short('s').Int()
+	secondsRateLimit = kingpin.Flag("rate-limit", "Seconds ignore input on a failed authentication").Default("5").Short('r').Int()
+	doorPort         = kingpin.Flag("door-port", "Port the door microservice API listens on").Default("8080").Short('p').Int()
+	door             doorapi.Door
 )
 
 func init() {
@@ -40,7 +41,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	totps = totpset.NewSet(3)
+	totps = totpset.NewSet(*secondsRateLimit)
 	totps.ValidityCallback = passcodeToTimePolicy
 	for _, account := range accounts {
 		accKey := totpset.NewKey(account.Name, account.Secret)
